@@ -93,9 +93,6 @@ public class IGNetworkInterceptor {
                                                 || uri.getPath().contains("stories/hallpass/")
                                                 || uri.getPath().contains("/api/v1/feed/reels_media_stream/");
                                     }
-                                    if (FeatureFlags.disableFeed) {
-                                        shouldDrop |= uri.getPath().endsWith("/feed/timeline/");
-                                    }
                                     if (FeatureFlags.disableReels && !FeatureFlags.disableReelsExceptDM) {
                                         shouldDrop |= uri.getPath().endsWith("/qp/batch_fetch/")
                                                 || uri.getPath().contains("api/v1/clips")

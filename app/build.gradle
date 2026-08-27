@@ -55,4 +55,5 @@ dependencies {
 
     // Compile-only dependency
     compileOnly files('libs/api-82.jar')
+    testImplementation files('libs/api-82.jar')
 }

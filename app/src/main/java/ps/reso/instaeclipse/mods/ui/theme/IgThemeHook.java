@@ -2,9 +2,11 @@ package ps.reso.instaeclipse.mods.ui.theme;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -42,6 +44,9 @@ public class IgThemeHook {
             hookGetColor(classLoader);
             hookContextGetColor();
             hookTypedArrayGetColor(classLoader);
+            hookTypedArrayGetColorStateList(classLoader);
+            hookTypedArrayGetDrawable(classLoader);
+            hookViewBackgroundColor();
             hookActivityLifecycle();
             hookPhoneWindowColors(classLoader);
             installed = true;
@@ -90,6 +95,10 @@ public class IgThemeHook {
             protected void beforeHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()) return;
                 int resId = (Integer) param.args[0];
+                if (resId == 0) {
+                    param.setResult(Color.TRANSPARENT);
+                    return;
+                }
                 if (IgThemeEngine.looksLikeDirectColor(resId)) {
                     param.setResult(IgColorRemapEngine.remap(resId));
                     return;
@@ -134,6 +143,10 @@ public class IgThemeHook {
             protected void beforeHookedMethod(MethodHookParam param) {
                 if (!FeatureFlags.customThemeEnabled || IgColorRemapEngine.isBypassing()) return;
                 int resId = (Integer) param.args[0];
+                if (resId == 0) {
+                    param.setResult(Color.TRANSPARENT);
+                    return;
+                }
                 if (IgThemeEngine.looksLikeDirectColor(resId)) {
                     param.setResult(IgColorRemapEngine.remap(resId));
                     return;
@@ -197,6 +210,60 @@ public class IgThemeHook {
                         }
                     }
                 } catch (Throwable ignored) {}
+            }
+        });
+    }
+
+    private void hookTypedArrayGetColorStateList(final ClassLoader cl) {
+        XposedHelpers.findAndHookMethod(TypedArray.class, "getColorStateList", int.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                if (IgColorRemapEngine.isBypassing() || !FeatureFlags.customThemeEnabled
+                        || param.getThrowable() != null || !(param.getResult() instanceof ColorStateList)) return;
+                Resources res = typedArrayResources((TypedArray) param.thisObject);
+                if (res == null) return;
+                IgThemeEngine.ensureInitialized(res, cl);
+                IgColorRemapEngine.ensureBuilt(res, cl);
+                if (!IgColorRemapEngine.isReady()) return;
+                ColorStateList original = (ColorStateList) param.getResult();
+                if (original.isStateful()) return;
+                int color = original.getDefaultColor();
+                int remapped = IgColorRemapEngine.remap(color);
+                if (remapped != color) param.setResult(ColorStateList.valueOf(remapped));
+            }
+        });
+    }
+
+    private void hookTypedArrayGetDrawable(final ClassLoader cl) {
+        XposedHelpers.findAndHookMethod(TypedArray.class, "getDrawable", int.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                if (IgColorRemapEngine.isBypassing() || !FeatureFlags.customThemeEnabled
+                        || param.getThrowable() != null || !(param.getResult() instanceof ColorDrawable)) return;
+                Resources res = typedArrayResources((TypedArray) param.thisObject);
+                if (res == null) return;
+                IgThemeEngine.ensureInitialized(res, cl);
+                IgColorRemapEngine.ensureBuilt(res, cl);
+                if (!IgColorRemapEngine.isReady()) return;
+                int color = ((ColorDrawable) param.getResult()).getColor();
+                int remapped = IgColorRemapEngine.remap(color);
+                if (remapped != color) param.setResult(new ColorDrawable(remapped));
+            }
+        });
+    }
+
+    private void hookViewBackgroundColor() {
+        XposedHelpers.findAndHookMethod(View.class, "setBackgroundColor", int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                if (IgColorRemapEngine.shouldSkipRemap(param.thisObject)) return;
+                View view = (View) param.thisObject;
+                if (!IgColorRemapEngine.isReady()) {
+                    IgThemeEngine.ensureInitialized(view.getContext());
+                    IgColorRemapEngine.ensureBuilt(view.getContext());
+                }
+                if (!IgColorRemapEngine.isReady()) return;
+                IgColorRemapEngine.applyRemapArg(param.args, 0);
             }
         });
     }

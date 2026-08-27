@@ -117,10 +117,15 @@ public final class IgColorRemapEngine {
     }
 
     public static void ensureBuilt(Context context) {
-        if (built || context == null || !IgThemeEngine.isActive()) return;
+        if (context == null) return;
+        ensureBuilt(context.getResources(), context.getClassLoader());
+    }
+
+    public static void ensureBuilt(Resources resources, ClassLoader classLoader) {
+        if (built || resources == null || !IgThemeEngine.isActive()) return;
         synchronized (IgColorRemapEngine.class) {
             if (built) return;
-            buildTable(context);
+            buildTable(resources, classLoader);
             built = true;
             int size = (rgbTable != null ? rgbTable.size() : 0) + (exactTable != null ? exactTable.size() : 0);
             ModuleLog.line("(InstaEclipse | Theme): color remap table size=" + size);
@@ -216,17 +221,16 @@ public final class IgColorRemapEngine {
         return r > 180 && r > g + 60 && r > b + 60;
     }
 
-    private static void buildTable(Context context) {
+    private static void buildTable(Resources res, ClassLoader classLoader) {
         SparseIntArray exact = new SparseIntArray(128);
         SparseIntArray rgb = new SparseIntArray(512);
         IgThemePalette palette = IgThemeEngine.getActivePalette();
         cacheFuzzyPalette(palette);
-        Resources res = context.getResources();
         String pkg = res.getResourcePackageName(android.R.color.black);
         mapCanonical(exact, rgb, palette);
         mapResourceNames(exact, rgb, res, pkg, palette);
         mapFromSlots(exact, rgb, res, pkg, palette);
-        mapAllResourceColors(exact, rgb, res, context.getClassLoader(), palette);
+        mapAllResourceColors(exact, rgb, res, classLoader, palette);
         exactTable = exact;
         rgbTable = rgb;
         fuzzyCache = new SparseIntArray(256);

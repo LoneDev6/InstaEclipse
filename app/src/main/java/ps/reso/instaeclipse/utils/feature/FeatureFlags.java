@@ -50,6 +50,13 @@ public class FeatureFlags {
     public static boolean isMiscEnabled = false;
     public static boolean disableStoryFlipping = false;
     public static boolean disableVideoAutoPlay = false;
+    public static boolean lowMemoryMode = false;
+    public static boolean hideReelsTab = false;
+    public static boolean storiesGridLayout = false;
+    public static boolean hideForYouTitle = false;
+    public static boolean hideSearchOverflow = false;
+    public static boolean hideInboxNotes = false;
+    public static boolean hideChatSearchAi = false;
     public static boolean spoofLastSeen = false;
     public static boolean showFollowerToast = false;
     public static boolean showFeatureToasts = false;

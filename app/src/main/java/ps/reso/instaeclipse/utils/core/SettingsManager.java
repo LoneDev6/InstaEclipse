@@ -69,6 +69,13 @@ public class SettingsManager {
         editor.putBoolean("isMiscEnabled", FeatureFlags.isMiscEnabled);
         editor.putBoolean("disableStoryFlipping", FeatureFlags.disableStoryFlipping);
         editor.putBoolean("disableVideoAutoPlay", FeatureFlags.disableVideoAutoPlay);
+        editor.putBoolean("lowMemoryMode", FeatureFlags.lowMemoryMode);
+        editor.putBoolean("hideReelsTab", FeatureFlags.hideReelsTab);
+        editor.putBoolean("storiesGridLayout", FeatureFlags.storiesGridLayout);
+        editor.putBoolean("hideForYouTitle", FeatureFlags.hideForYouTitle);
+        editor.putBoolean("hideSearchOverflow", FeatureFlags.hideSearchOverflow);
+        editor.putBoolean("hideInboxNotes", FeatureFlags.hideInboxNotes);
+        editor.putBoolean("hideChatSearchAi", FeatureFlags.hideChatSearchAi);
         editor.putBoolean("spoofLastSeen", FeatureFlags.spoofLastSeen);
         editor.putBoolean("spoofLocation", FeatureFlags.spoofLocation);
         editor.putString("spoofLat", String.valueOf(FeatureFlags.spoofLat));
@@ -158,6 +165,13 @@ public class SettingsManager {
         FeatureFlags.isMiscEnabled = prefs.getBoolean("isMiscEnabled", false);
         FeatureFlags.disableStoryFlipping = prefs.getBoolean("disableStoryFlipping", false);
         FeatureFlags.disableVideoAutoPlay = prefs.getBoolean("disableVideoAutoPlay", false);
+        FeatureFlags.lowMemoryMode = prefs.getBoolean("lowMemoryMode", false);
+        FeatureFlags.hideReelsTab = prefs.getBoolean("hideReelsTab", false);
+        FeatureFlags.storiesGridLayout = prefs.getBoolean("storiesGridLayout", false);
+        FeatureFlags.hideForYouTitle = prefs.getBoolean("hideForYouTitle", false);
+        FeatureFlags.hideSearchOverflow = prefs.getBoolean("hideSearchOverflow", false);
+        FeatureFlags.hideInboxNotes = prefs.getBoolean("hideInboxNotes", false);
+        FeatureFlags.hideChatSearchAi = prefs.getBoolean("hideChatSearchAi", false);
         FeatureFlags.spoofLastSeen = prefs.getBoolean("spoofLastSeen", false);
         FeatureFlags.spoofLocation = prefs.getBoolean("spoofLocation", false);
         FeatureFlags.spoofLat = readDoublePref(prefs, "spoofLat", 0.0);

@@ -16,4 +16,12 @@
     <color name="bottom_nav_icon">#B0BEC5</color>
     <color name="bottom_nav_icon_active">#448AFF</color>
     <color name="purple_200">#9C27B0</color>
+
+    <!-- One UI settings palette -->
+    <color name="oneui_background">#F7F7F7</color>
+    <color name="oneui_card">#FFFFFF</color>
+    <color name="oneui_text_primary">#010101</color>
+    <color name="oneui_text_secondary">#777777</color>
+    <color name="oneui_divider">#E5E5E5</color>
+    <color name="oneui_accent">#0381FE</color>
 </resources>

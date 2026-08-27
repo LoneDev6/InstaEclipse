@@ -117,9 +117,6 @@ public final class IgThemeEngine {
         if (override == null || out == null) return;
         out.type = TypedValue.TYPE_INT_COLOR_ARGB8;
         out.data = override;
-        out.resourceId = 0;
-        out.assetCookie = 0;
-        out.string = null;
     }
 
     private static void initMappings(Resources res, String pkg, ClassLoader cl) {
@@ -201,6 +198,11 @@ public final class IgThemeEngine {
 
     static int slotForAttrName(String name) {
         if (name == null) return -1;
+        if (name.equals("backgroundColorPrimary") || name.equals("directThreadActionBarBackgroundColor")
+                || name.equals("messageComposerBackgroundColor")) return 0;
+        if (name.equals("backgroundColorSecondary") || name.equals("messageComposerRedesignBackgroundColor")
+                || name.equals("messageFromOthersGrayBackground") || name.equals("reactionsMessagePillBackgroundColor")
+                || name.equals("forwardingAndReplyShortcutIconBackgroundColor")) return 1;
         if (name.contains("primary_background") || name.contains("media_background") || name.contains("tab_bar_background")) return 0;
         if ((name.contains("clips_tab") && name.contains(IgThemePalette.SLOT_BACKGROUND)) || name.equals("status_bar_background")
                 || name.contains("cta_banner") || name.equals("igdsPrimaryBackground") || name.contains("actionBarBackground")

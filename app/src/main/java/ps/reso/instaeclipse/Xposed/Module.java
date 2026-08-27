@@ -52,6 +52,7 @@ import ps.reso.instaeclipse.mods.misc.CaptionCopyContextMenuHook;
 import ps.reso.instaeclipse.mods.misc.DisableDoubleTapLikeHook;
 import ps.reso.instaeclipse.mods.misc.DisableStoryFlippingHook;
 import ps.reso.instaeclipse.mods.misc.DisableVideoAutoPlayHook;
+import ps.reso.instaeclipse.mods.misc.LowMemoryModeHook;
 import ps.reso.instaeclipse.mods.misc.StoryMentionHook;
 import ps.reso.instaeclipse.mods.network.IGNetworkInterceptor;
 import ps.reso.instaeclipse.mods.ui.UIHookManager;
@@ -198,6 +199,12 @@ public class Module implements IXposedHookLoadPackage, IXposedHookZygoteInit {
                     IGNetworkInterceptor interceptor = new IGNetworkInterceptor();
 
                     // --- Feature Hooks ---
+
+                    try {
+                        new LowMemoryModeHook().install(context);
+                    } catch (Throwable ignored) {
+                        ModuleLog.line("(InstaEclipse | LowMemory): ❌ Failed to hook");
+                    }
 
                     // Developer Options
                     try {

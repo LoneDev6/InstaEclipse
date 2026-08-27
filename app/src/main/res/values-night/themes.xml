@@ -1,7 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.InstaEclipse" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Theme.InstaEclipse" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:windowBackground">@color/oneui_background</item>
+        <item name="android:statusBarColor">@color/oneui_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/oneui_background</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="colorPrimary">@color/oneui_accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/oneui_accent</item>
+        <item name="colorSurface">@color/oneui_background</item>
+        <item name="colorSurfaceContainer">@color/oneui_card</item>
+        <item name="colorSurfaceContainerLow">@color/oneui_card</item>
+        <item name="colorOnSurface">@color/oneui_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/oneui_text_secondary</item>
+        <item name="colorOutlineVariant">@color/oneui_divider</item>
     </style>
 </resources>

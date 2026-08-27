@@ -37,7 +37,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.color.MaterialColors;
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.shape.ShapeAppearanceModel;
 
@@ -47,13 +46,13 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import ps.reso.instaeclipse.R;
+import ps.reso.instaeclipse.MainActivity;
 import ps.reso.instaeclipse.mods.location.LocationPickerActivity;
 import ps.reso.instaeclipse.ui.theme.ThemeCustomizerActivity;
 
@@ -65,7 +64,6 @@ public class FeaturesFragment extends Fragment {
     private FeatureAdapter adapter;
     private TextView tvHeaderTitle;
     private ImageButton btnBack;
-    private ExtendedFloatingActionButton fabSave;
     private ActivityResultLauncher<Uri> dirPickerLauncher;
     private ActivityResultLauncher<String[]> restoreFileLauncher;
     private ActivityResultLauncher<String> notifPermLauncher;
@@ -74,8 +72,7 @@ public class FeaturesFragment extends Fragment {
 
     private String currentMenu = "main";
 
-    // STAGING SYSTEM: Holds changes before applying
-    private final Map<String, Boolean> stagedChanges = new HashMap<>();
+    private boolean settingsOnly;
 
     private final BroadcastReceiver prefsReceiver = new BroadcastReceiver() {
         @Override
@@ -229,6 +226,7 @@ public class FeaturesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_features, container, false);
         localCache = requireContext().getSharedPreferences("instaeclipse_cache", Context.MODE_PRIVATE);
+        settingsOnly = requireActivity().getIntent().getBooleanExtra(MainActivity.EXTRA_SETTINGS_ONLY, false);
 
         // Request POST_NOTIFICATIONS permission (required API 33+ for download progress notifications)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -248,9 +246,13 @@ public class FeaturesFragment extends Fragment {
 
         tvHeaderTitle = fragmentView.findViewById(R.id.tv_header_title);
         btnBack = fragmentView.findViewById(R.id.btn_back);
-        fabSave = fragmentView.findViewById(R.id.fab_save);
-
-        btnBack.setOnClickListener(v -> loadMainMenu());
+        btnBack.setOnClickListener(v -> {
+            if (!"main".equals(currentMenu)) {
+                loadMainMenu();
+            } else if (settingsOnly) {
+                requireActivity().finish();
+            }
+        });
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
@@ -263,8 +265,6 @@ public class FeaturesFragment extends Fragment {
                 }
             }
         });
-
-        fabSave.setOnClickListener(v -> commitStagedChanges());
 
         loadMainMenu();
 
@@ -317,12 +317,14 @@ public class FeaturesFragment extends Fragment {
         ImageView ivIcon;
         MaterialSwitch swToggle;
         MaterialCardView cardView;
+        View divider;
         ItemViewHolder(View v) {
             super(v);
             tvTitle = v.findViewById(R.id.tv_title);
             ivIcon = v.findViewById(R.id.iv_icon);
             swToggle = v.findViewById(R.id.sw_toggle);
             cardView = (MaterialCardView) v;
+            divider = v.findViewById(R.id.row_divider);
         }
     }
 
@@ -374,26 +376,18 @@ public class FeaturesFragment extends Fragment {
                 ItemViewHolder itemHolder = (ItemViewHolder) holder;
 
                 itemHolder.tvTitle.setText(item.title);
-                bindIcon(itemHolder.ivIcon, item.iconRes, item.accentColor);
+                bindIcon(itemHolder.ivIcon, item.iconRes);
 
-                // Master switches get a tinted card + bold text to stand out from regular items
                 boolean isMaster = item.type == FeatureItem.TYPE_MASTER_SWITCH;
-                if (isMaster) {
-                    int bg = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorSecondaryContainer);
-                    int fg = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorOnSecondaryContainer);
-                    itemHolder.cardView.setCardBackgroundColor(bg);
-                    itemHolder.tvTitle.setTextColor(fg);
-                    itemHolder.tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
-                } else {
-                    int bg = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorSurfaceContainerLow);
-                    int defaultTextColor = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorOnSurface);
-                    itemHolder.cardView.setCardBackgroundColor(bg);
-                    itemHolder.tvTitle.setTextColor(item.textColor != 0 ? item.textColor : defaultTextColor);
-                    itemHolder.tvTitle.setTypeface(null, android.graphics.Typeface.NORMAL);
-                }
+                int bg = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorSurfaceContainerLow);
+                int defaultTextColor = MaterialColors.getColor(itemHolder.itemView, com.google.android.material.R.attr.colorOnSurface);
+                itemHolder.cardView.setCardBackgroundColor(bg);
+                itemHolder.tvTitle.setTextColor(item.textColor != 0 ? item.textColor : defaultTextColor);
+                itemHolder.tvTitle.setTypeface(null, isMaster
+                        ? android.graphics.Typeface.BOLD : android.graphics.Typeface.NORMAL);
 
-                float largeRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
-                float smallRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
+                float largeRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26f, getResources().getDisplayMetrics());
+                float smallRadius = 0f;
 
                 ShapeAppearanceModel.Builder shapeBuilder = itemHolder.cardView.getShapeAppearanceModel().toBuilder();
 
@@ -409,6 +403,8 @@ public class FeaturesFragment extends Fragment {
                     shapeBuilder.setAllCornerSizes(smallRadius);
                 }
                 itemHolder.cardView.setShapeAppearanceModel(shapeBuilder.build());
+                itemHolder.divider.setVisibility(item.segmentPosition == item.segmentSize - 1
+                        ? View.GONE : View.VISIBLE);
 
                 // Compute enabled state from conditions
                 boolean switchEnabled = true;
@@ -531,7 +527,7 @@ public class FeaturesFragment extends Fragment {
             return items.size();
         }
 
-        private void bindIcon(ImageView iconView, int iconRes, int accentColor) {
+        private void bindIcon(ImageView iconView, int iconRes) {
             if (iconRes == 0) {
                 iconView.setVisibility(View.GONE);
                 return;
@@ -540,13 +536,11 @@ public class FeaturesFragment extends Fragment {
             android.graphics.drawable.Drawable icon = ContextCompat.getDrawable(iconView.getContext(), iconRes);
             if (icon != null) {
                 icon = icon.mutate();
-                icon.setColorFilter(new android.graphics.PorterDuffColorFilter(accentColor, android.graphics.PorterDuff.Mode.SRC_IN));
+                int tint = MaterialColors.getColor(iconView, com.google.android.material.R.attr.colorOnSurface);
+                icon.setColorFilter(new android.graphics.PorterDuffColorFilter(tint, android.graphics.PorterDuff.Mode.SRC_IN));
                 iconView.setImageDrawable(icon);
             }
-            android.graphics.drawable.GradientDrawable chipBg = new android.graphics.drawable.GradientDrawable();
-            chipBg.setColor((accentColor & 0x00FFFFFF) | 0x33000000);
-            chipBg.setCornerRadius(iconView.getResources().getDisplayMetrics().density * 10);
-            iconView.setBackground(chipBg);
+            iconView.setBackground(null);
         }
     }
 
@@ -559,7 +553,8 @@ public class FeaturesFragment extends Fragment {
         TransitionManager.beginDelayedTransition(headerLayout, new AutoTransition().setDuration(200));
 
         tvHeaderTitle.setText(title);
-        btnBack.setVisibility(title.equals(getString(R.string.features)) ? View.GONE : View.VISIBLE);
+        btnBack.setVisibility(settingsOnly || !title.equals(getString(R.string.features))
+                ? View.VISIBLE : View.GONE);
 
         List<FeatureItem> displayList = new ArrayList<>();
         for (int di = 0; di < definitions.size(); di++) {
@@ -853,7 +848,8 @@ public class FeaturesFragment extends Fragment {
                 disableReels,
                 disableReelsExceptDM,
                 createSwitchLockedByExtreme(R.drawable.ic_search, "#30D158", getString(R.string.ig_dialog_distraction_disable_explore), "disableExplore"),
-                createSwitchLockedByExtreme(R.drawable.ic_chat, "#30D158", getString(R.string.ig_dialog_distraction_disable_comments), "disableComments")
+                createSwitchLockedByExtreme(R.drawable.ic_chat, "#30D158", getString(R.string.ig_dialog_distraction_disable_comments), "disableComments"),
+                createSwitchLockedByExtreme(R.drawable.ic_story_ring, "#30D158", getString(R.string.ig_dialog_misc_stories_grid), "storiesGridLayout")
         ));
 
         showMenu(getString(R.string.ig_dialog_section_distraction_free), defs);
@@ -879,12 +875,19 @@ public class FeaturesFragment extends Fragment {
         defs.add(getString(R.string.feat_features));
         defs.add(Arrays.asList(
                 createMasterSwitch(getString(R.string.ig_dialog_enable_disable_all), Arrays.asList(
-                        "disableStoryFlipping", "disableVideoAutoPlay", "spoofLastSeen", "disableRepost", "showFollowerToast",
+                        "disableStoryFlipping", "disableVideoAutoPlay", "lowMemoryMode", "hideReelsTab", "spoofLastSeen", "disableRepost", "showFollowerToast",
                         "showFeatureToasts", "enableStoryMentions", "disableDiscoverPeople", "enableCopyComment",
-                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom"
+                        "disableDoubleTapLike", "enableCaptionCopy", "enablePhotoZoom", "hideForYouTitle",
+                        "hideSearchOverflow", "hideInboxNotes", "hideChatSearchAi"
                 )),
                 createSwitch(R.drawable.ic_story_ring, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_story_autoswipe), "disableStoryFlipping"),
                 createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_video_autoplay), "disableVideoAutoPlay"),
+                createSwitch(R.drawable.ic_delete, "#BF5AF2", getString(R.string.ig_dialog_misc_low_memory_mode), "lowMemoryMode"),
+                createSwitch(R.drawable.ic_movie, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_reels_tab), "hideReelsTab"),
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_for_you_title), "hideForYouTitle"),
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_search_overflow), "hideSearchOverflow"),
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_inbox_notes), "hideInboxNotes"),
+                createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_hide_chat_search_ai), "hideChatSearchAi"),
                 createSwitch(R.drawable.ic_timer, "#BF5AF2", getString(R.string.ig_dialog_misc_spoof_last_seen), "spoofLastSeen"),
                 createSwitch(R.drawable.ic_block, "#BF5AF2", getString(R.string.ig_dialog_misc_disable_repost), "disableRepost"),
                 createSwitch(R.drawable.ic_notification, "#BF5AF2", getString(R.string.ig_dialog_misc_show_follower_toast), "showFollowerToast"),
@@ -1187,47 +1190,22 @@ public class FeaturesFragment extends Fragment {
     }
 
     // =========================================================
-    // STAGING LOGIC
+    // SETTINGS PERSISTENCE
     // =========================================================
 
     private void stageChange(String prefKey, boolean isChecked) {
-        if (localCache.getBoolean(prefKey, false) == isChecked) {
-            stagedChanges.remove(prefKey);
-        } else {
-            stagedChanges.put(prefKey, isChecked);
-        }
+        if (localCache.getBoolean(prefKey, false) == isChecked) return;
+        localCache.edit().putBoolean(prefKey, isChecked).commit();
+        makeLocalCacheWorldReadable();
 
-        if (stagedChanges.isEmpty()) {
-            fabSave.hide();
-        } else {
-            fabSave.show();
-        }
-    }
-
-    private void commitStagedChanges() {
-        if (stagedChanges.isEmpty()) return;
-
-        SharedPreferences.Editor editor = localCache.edit();
-        for (Map.Entry<String, Boolean> entry : stagedChanges.entrySet()) {
-            String key = entry.getKey();
-            boolean value = entry.getValue();
-
-            editor.putBoolean(key, value);
-
-            Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
-            intent.putExtra("key", key);
-            intent.putExtra("value", value);
-            requireContext().sendBroadcast(intent);
-        }
-        editor.apply();
-        stagedChanges.clear();
-        fabSave.hide();
-        Toast.makeText(requireContext(), getString(R.string.ig_toast_settings_applied), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent("ps.reso.instaeclipse.ACTION_UPDATE_PREF");
+        intent.putExtra("key", prefKey);
+        intent.putExtra("value", isChecked);
+        requireContext().sendBroadcast(intent);
     }
 
     private boolean getCurrentState(String prefKey) {
         if (prefKey == null) return false;
-        if (stagedChanges.containsKey(prefKey)) return stagedChanges.get(prefKey);
         return localCache.getBoolean(prefKey, false);
     }
 

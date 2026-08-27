@@ -64,6 +64,13 @@ public class SettingsBackupManager {
         // Miscellaneous
         s.put("disableStoryFlipping",    FeatureFlags.disableStoryFlipping);
         s.put("disableVideoAutoPlay",    FeatureFlags.disableVideoAutoPlay);
+        s.put("lowMemoryMode",           FeatureFlags.lowMemoryMode);
+        s.put("hideReelsTab",            FeatureFlags.hideReelsTab);
+        s.put("storiesGridLayout",       FeatureFlags.storiesGridLayout);
+        s.put("hideForYouTitle",         FeatureFlags.hideForYouTitle);
+        s.put("hideSearchOverflow",      FeatureFlags.hideSearchOverflow);
+        s.put("hideInboxNotes",          FeatureFlags.hideInboxNotes);
+        s.put("hideChatSearchAi",        FeatureFlags.hideChatSearchAi);
         s.put("spoofLastSeen",           FeatureFlags.spoofLastSeen);
         s.put("spoofLocation",           FeatureFlags.spoofLocation);
         s.put("spoofLat",                String.valueOf(FeatureFlags.spoofLat));
@@ -141,6 +148,13 @@ public class SettingsBackupManager {
 
         if (s.has("disableStoryFlipping"))   FeatureFlags.disableStoryFlipping   = s.getBoolean("disableStoryFlipping");
         if (s.has("disableVideoAutoPlay"))   FeatureFlags.disableVideoAutoPlay   = s.getBoolean("disableVideoAutoPlay");
+        if (s.has("lowMemoryMode"))          FeatureFlags.lowMemoryMode          = s.getBoolean("lowMemoryMode");
+        if (s.has("hideReelsTab"))           FeatureFlags.hideReelsTab           = s.getBoolean("hideReelsTab");
+        if (s.has("storiesGridLayout"))      FeatureFlags.storiesGridLayout      = s.getBoolean("storiesGridLayout");
+        if (s.has("hideForYouTitle"))        FeatureFlags.hideForYouTitle        = s.getBoolean("hideForYouTitle");
+        if (s.has("hideSearchOverflow"))     FeatureFlags.hideSearchOverflow     = s.getBoolean("hideSearchOverflow");
+        if (s.has("hideInboxNotes"))         FeatureFlags.hideInboxNotes         = s.getBoolean("hideInboxNotes");
+        if (s.has("hideChatSearchAi"))       FeatureFlags.hideChatSearchAi       = s.getBoolean("hideChatSearchAi");
         if (s.has("spoofLastSeen"))          FeatureFlags.spoofLastSeen          = s.getBoolean("spoofLastSeen");
         if (s.has("spoofLocation"))          FeatureFlags.spoofLocation          = s.getBoolean("spoofLocation");
         if (s.has("spoofLat"))               FeatureFlags.spoofLat               = parseDouble(s.get("spoofLat"), 0.0);

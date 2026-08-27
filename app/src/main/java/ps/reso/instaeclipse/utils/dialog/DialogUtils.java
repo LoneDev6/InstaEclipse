@@ -76,23 +76,6 @@ public class DialogUtils {
         ScrollView scrollView = createScrollableContainer(context, mainLayout, 0.62f);
         outer.addView(scrollView);
 
-        // Pinned footer: Close button (always reachable without scrolling)
-        TextView closeButton = new TextView(context);
-        closeButton.setText(I18n.t(context, R.string.ig_dialog_close));
-        closeButton.setTextColor(Color.parseColor("#FF453A"));
-        closeButton.setTextSize(16);
-        closeButton.setPadding(40, 20, 40, 40);
-        closeButton.setGravity(Gravity.CENTER);
-        closeButton.setTypeface(null, Typeface.BOLD);
-        StateListDrawable closeStates = new StateListDrawable();
-        closeStates.addState(new int[]{android.R.attr.state_pressed}, new ColorDrawable(Color.parseColor("#20FF453A")));
-        closeStates.addState(new int[]{}, new ColorDrawable(Color.TRANSPARENT));
-        closeButton.setBackground(closeStates);
-        closeButton.setOnClickListener(v -> {
-            if (currentDialog != null) { try { currentDialog.dismiss(); } catch (Exception ignored) {} currentDialog = null; }
-        });
-        outer.addView(closeButton);
-
         SettingsManager.saveAllFlags();
 
         Activity activity = UIHookManager.getCurrentActivity();
@@ -842,6 +825,9 @@ public class DialogUtils {
         ToggleRow[] switches = new ToggleRow[]{
                 createSwitch(context, R.drawable.ic_story_ring, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_story_autoswipe), FeatureFlags.disableStoryFlipping),
                 createSwitch(context, R.drawable.ic_movie, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_video_autoplay),  FeatureFlags.disableVideoAutoPlay),
+                createSwitch(context, R.drawable.ic_delete, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_low_memory_mode), FeatureFlags.lowMemoryMode),
+                createSwitch(context, R.drawable.ic_movie, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_hide_reels_tab), FeatureFlags.hideReelsTab),
+                createSwitch(context, R.drawable.ic_story_ring, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_stories_grid), FeatureFlags.storiesGridLayout),
                 createSwitch(context, R.drawable.ic_block, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_disable_repost),          FeatureFlags.disableRepost),
                 createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_show_feature_toasts),     FeatureFlags.showFeatureToasts),
                 createSwitch(context, R.drawable.ic_notification, "#BF5AF2", I18n.t(context, R.string.ig_dialog_misc_show_follower_toast),     FeatureFlags.showFollowerToast),
@@ -883,33 +869,42 @@ public class DialogUtils {
                         FeatureFlags.disableVideoAutoPlay = isChecked;
                         break;
                     case 2:
-                        FeatureFlags.disableRepost = isChecked;
+                        FeatureFlags.lowMemoryMode = isChecked;
                         break;
                     case 3:
-                        FeatureFlags.showFeatureToasts = isChecked;
+                        FeatureFlags.hideReelsTab = isChecked;
                         break;
                     case 4:
-                        FeatureFlags.showFollowerToast = isChecked;
+                        FeatureFlags.storiesGridLayout = isChecked;
                         break;
                     case 5:
-                        FeatureFlags.enableStoryMentions = isChecked;
+                        FeatureFlags.disableRepost = isChecked;
                         break;
                     case 6:
-                        FeatureFlags.disableDiscoverPeople = isChecked;
+                        FeatureFlags.showFeatureToasts = isChecked;
                         break;
                     case 7:
-                        FeatureFlags.enableCopyComment = isChecked;
+                        FeatureFlags.showFollowerToast = isChecked;
                         break;
                     case 8:
-                        FeatureFlags.disableDoubleTapLike = isChecked;
+                        FeatureFlags.enableStoryMentions = isChecked;
                         break;
                     case 9:
-                        FeatureFlags.enableCaptionCopy = isChecked;
+                        FeatureFlags.disableDiscoverPeople = isChecked;
                         break;
                     case 10:
-                        FeatureFlags.enablePhotoZoom = isChecked;
+                        FeatureFlags.enableCopyComment = isChecked;
                         break;
                     case 11:
+                        FeatureFlags.disableDoubleTapLike = isChecked;
+                        break;
+                    case 12:
+                        FeatureFlags.enableCaptionCopy = isChecked;
+                        break;
+                    case 13:
+                        FeatureFlags.enablePhotoZoom = isChecked;
+                        break;
+                    case 14:
                         FeatureFlags.spoofLastSeen = isChecked;
                         break;
                 }

@@ -321,6 +321,13 @@
     <!-- Miscellaneous options -->
     <string name="ig_dialog_misc_disable_story_autoswipe">Disable Story Auto-Swipe</string>
     <string name="ig_dialog_misc_disable_video_autoplay">Disable Video Autoplay</string>
+    <string name="ig_dialog_misc_low_memory_mode">Low memory mode (remove media cache in background)</string>
+    <string name="ig_dialog_misc_hide_reels_tab">Hide Reels button from bottom bar</string>
+    <string name="ig_dialog_misc_stories_grid">Show Stories in a 4-column grid</string>
+    <string name="ig_dialog_misc_hide_for_you_title">Hide “For you” title at the top</string>
+    <string name="ig_dialog_misc_hide_search_overflow">Hide three-dot menu in Search</string>
+    <string name="ig_dialog_misc_hide_inbox_notes">Hide Notes above Messages</string>
+    <string name="ig_dialog_misc_hide_chat_search_ai">Hide AI section in chat search</string>
     <string name="ig_dialog_misc_spoof_last_seen">Spoof Last Seen (freeze)</string>
     <string name="ig_dialog_misc_disable_repost">Disable Repost</string>
     <string name="ig_dialog_misc_show_feature_toasts">Show Feature Toasts</string>

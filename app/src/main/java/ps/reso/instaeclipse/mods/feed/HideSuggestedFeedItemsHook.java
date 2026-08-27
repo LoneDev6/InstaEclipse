@@ -24,10 +24,15 @@ public class HideSuggestedFeedItemsHook {
         XC_MethodHook filterHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                if (!FeatureFlags.hideSuggestionsInFeed && !FeatureFlags.hideThreadsSuggestions) return;
+                if (!FeatureFlags.disableFeed && !FeatureFlags.hideSuggestionsInFeed
+                        && !FeatureFlags.hideThreadsSuggestions) return;
 
                 Object result = param.getResult();
                 if (result == null) return;
+                if (FeatureFlags.disableFeed) {
+                    param.setResult(null);
+                    return;
+                }
 
                 // The parsed FeedItem is a large union type — exactly one of its many
                 // optional fields is populated per server-sent unit. A real post always
