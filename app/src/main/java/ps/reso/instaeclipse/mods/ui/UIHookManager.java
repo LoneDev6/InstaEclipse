@@ -425,6 +425,7 @@ public class UIHookManager {
     }
 
     public void mainActivity(ClassLoader classLoader) {
+        WatchHistoryBulkDeleteHook.install();
         installDistractionMessageHook();
         installStoriesGridHooks();
 
